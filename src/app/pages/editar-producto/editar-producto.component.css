@@ -1,0 +1,68 @@
+.edit-container {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.edit-container h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.register-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.invalid {
+  border: 1px solid red;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.85rem;
+  margin-top: 3px;
+}
+
+.buttons-row {
+  grid-column: 1 / 3;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.buttons-row button {
+  background-color:#fbf361;
+  color: black;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.buttons-row button:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  .register-form {
+    grid-template-columns: 1fr;
+  }
+  .edit-container {
+    width: 95%;
+  }
+}

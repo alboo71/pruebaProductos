@@ -1,0 +1,194 @@
+<div class="container">
+    <h2 class="title">
+        <i class="icon-bank"></i> BANCO
+    </h2>
+
+    <div class="actions"> 
+        <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="filterProducts()"
+            placeholder="Search..."
+            class="search-input"
+        />
+        <button class="add-button" (click)="openModal()">Agregar Producto</button>
+    </div>
+
+    <div class="table-container">
+        <table class="product-table">
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>Nombre del producto</th>
+                    <th>Descripción</th>
+                    <th>Fecha de liberación</th>
+                    <th>Fecha de reestructuración</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let product of filteredProducts | slice : 0 : itemsPerPage">
+                    <td>
+                        <img 
+                            [src]="product.logo || 'assets/icons/pichincha_logo_despues.jpg'" 
+                            alt="Logo" 
+                            class="product-logo" 
+                        />
+                    </td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.description }}</td>
+                    <td>{{ product.date_release }}</td>
+                    <td>{{ product.date_revision }}</td>
+                    <td class="dropdown-cell">
+                        <button class="dropdown-toggle" (click)="toggleDropdown(product.id)">
+                            &#8942;  <!-- Código HTML para 'vertical ellipsis' (los 3 puntitos) -->
+                        </button>
+                    
+                        <div class="dropdown-menu" *ngIf="showDropdown[product.id]">
+                            <ul>
+                                <li (click)="editProduct(product.id)">Editar</li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <span>{{ filteredProducts.length }} Resultados</span>
+        <select [(ngModel)]="itemsPerPage">
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="20">20</option>
+        </select>
+    </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="isModalOpen" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h2>Formulario de registro</h2>
+            <button type="button" class="close-button" (click)="closeModal()">×</button>
+        </div>
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="register-form">
+
+        <div class="form-row">
+            <label for="id">ID</label>
+            <input
+                id="id"
+                type="text"
+                formControlName="id"
+                [class.invalid]="productForm.get('id')?.invalid && (productForm.get('id')?.touched || productForm.get('id')?.dirty)"
+                (blur)="validateId()"
+            />
+            <div class="error-message" *ngIf="productForm.get('id')?.errors?.['required']">
+                Campo requerido
+            </div>
+            <div class="error-message" *ngIf="productForm.get('id')?.errors?.['minlength']">
+                Mínimo 3 caracteres
+            </div>
+            <div class="error-message" *ngIf="productForm.get('id')?.errors?.['maxlength']">
+                Máximo 10 caracteres
+            </div>
+            <div class="error-message" *ngIf="productForm.get('id')?.errors?.['idExists']">
+                Este ID ya existe
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <label for="name">Nombre</label>
+            <input
+                id="name"
+                type="text"
+                formControlName="name"
+                [class.invalid]="productForm.get('name')?.invalid && productForm.get('name')?.touched"
+            />
+            <div class="error-message" *ngIf="productForm.get('name')?.errors?.['required']">
+                Campo requerido
+            </div>
+            <div class="error-message" *ngIf="productForm.get('name')?.errors?.['minlength']">
+                Mínimo 5 caracteres
+            </div>
+            <div class="error-message" *ngIf="productForm.get('name')?.errors?.['maxlength']">
+                Máximo 100 caracteres
+            </div>
+            </div>
+
+        <div class="form-row">
+            <label for="description">Descripción</label>
+            <textarea
+                id="description"
+                formControlName="description"
+                [class.invalid]="productForm.get('description')?.invalid && productForm.get('description')?.touched"
+            ></textarea>
+            <div class="error-message" *ngIf="productForm.get('description')?.errors?.['required']">
+                Campo requerido
+            </div>
+            <div class="error-message" *ngIf="productForm.get('description')?.errors?.['minlength']">
+                Mínimo 10 caracteres
+            </div>
+            <div class="error-message" *ngIf="productForm.get('description')?.errors?.['maxlength']">
+                Máximo 200 caracteres
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <label for="logo">Logo (URL)</label>
+            <input
+                id="logo"
+                type="text"
+                formControlName="logo"
+                [class.invalid]="productForm.get('logo')?.invalid && productForm.get('logo')?.touched"
+            />
+            <div class="error-message" *ngIf="productForm.get('logo')?.errors?.['required']">
+                Campo requerido
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <label for="date_release">Fecha Liberación</label>
+            <input
+                id="date_release"
+                type="date"
+                formControlName="date_release"
+                [class.invalid]="productForm.get('date_release')?.invalid && productForm.get('date_release')?.touched"
+                (change)="validateReleaseDate()"
+            />
+            <div class="error-message" *ngIf="productForm.get('date_release')?.errors?.['required']">
+                Campo requerido
+            </div>
+            <div class="error-message" *ngIf="productForm.get('date_release')?.errors?.['invalidDate']">
+                Debe ser >= fecha actual
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label for="date_revision">Fecha Revisión</label>
+            <input
+                id="date_revision"
+                type="date"
+                formControlName="date_revision"
+                [class.invalid]="productForm.get('date_revision')?.invalid && productForm.get('date_revision')?.touched"
+            />
+            <div class="error-message" *ngIf="productForm.get('date_revision')?.errors?.['required']">
+                Campo requerido
+            </div>
+            <div class="error-message" *ngIf="productForm.get('date_revision')?.errors?.['invalidDate']">
+                Debe ser 1 año después de la Liberación
+            </div>
+        </div>
+
+        <div class="buttons-row">
+            <button type="button" (click)="resetForm()" class="reiniciar-button">
+                Reiniciar
+            </button>
+            <button type="submit" class="enviar-button" [disabled]="productForm.invalid">
+                Enviar
+            </button>
+        </div>
+
+        </form>
+    </div>
+</div>
