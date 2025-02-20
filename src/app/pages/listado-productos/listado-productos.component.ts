@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';  // Asegúrate de importar OnInit
-import { ProductCardComponent } from '../../components/product-card/product-card.component';
 import { NgFor, NgIf } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { ProductsService } from '../../services/products.service';
